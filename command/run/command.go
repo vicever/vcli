@@ -783,7 +783,8 @@ func (cmd *Command) paramsVMWare(cores, memory, disk, name string, vmplayer bool
 		if err != nil {
 			fmt.Println(err)
 		}
-		pers := strings.Split(cmd.persist, "/")
+		// pers := strings.Split(cmd.persist, "/")
+		pers := filepath.SplitList(cmd.persist)
 		new := fullPath + "/" + pers[len(pers)-1]
 
 		err = os.Symlink(old, new)
@@ -822,7 +823,7 @@ func (cmd *Command) paramsVirtualBox(cores, memory, disk, name string, numberOfN
 	args = append(args, "--bioslogofadeout", "off", "--bioslogodisplaytime", "1", "--biosbootmenu", "disabled", "--rtcuseutc", "on")
 
 	if !cmd.headless && cmd.echo {
-		vBoxSerial, err = ioutil.TempFile("/tmp/", "vBoxSerial")
+		vBoxSerial, err = ioutil.TempFile(tmpDir, "vBoxSerial")
 		if err != nil {
 			fmt.Println(err)
 		}
