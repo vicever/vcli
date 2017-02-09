@@ -16,7 +16,11 @@ package home
 import (
 	"errors"
 	"os"
+	"path"
 	"path/filepath"
+	"runtime"
+
+	homedir "github.com/mitchellh/go-homedir"
 )
 
 const (
@@ -79,21 +83,20 @@ func Initialize() error {
 
 	} else {
 
-		if l := len(os.Args); l > 1 && (os.Args[1] ==
-			"--completion-script-bash" || os.Args[1] ==
-			"--completion-bash" || os.Args[1] == "--help-man" ||
-			os.Args[1] == "--") {
-			SafeMode = true
+		usrHome, err := homedir.Dir()
+		if err != nil {
+			return err
 		}
 
-		if l := len(os.Args); l > 0 && (os.Args[l-1] ==
-			"--completion-script-bash" || os.Args[l-1] ==
-			"--completion-bash" || os.Args[l-1] == "--help-man" ||
-			os.Args[l-1] == "--") {
-			SafeMode = true
-		}
+		if runtime.GOOS == "windows" {
+			// windows
+			home = path.Join(usrHome, "vorteil")
 
-		return errors.New(envHome + " environment variable needs to be set: try adding 'export VORTEIL_HOME=$HOME/vorteil' to your bash profile")
+		} else {
+			// linux / mac
+			home = path.Join(usrHome, ".vorteil")
+
+		}
 
 	}
 

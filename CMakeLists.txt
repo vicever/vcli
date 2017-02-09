@@ -10,7 +10,7 @@ project (vcli)
 
 set(VERSION_MAJOR 0)
 set(VERSION_MINOR 5)
-set(VERSION_PATCH 0)
+set(VERSION_PATCH 1)
 
 
 # check go binary exists in path
@@ -50,7 +50,8 @@ set(GO_GET  github.com/alecthomas/kingpin
 	    github.com/hpcloud/tail
 	    google.golang.org/api/compute/v1
 	    golang.org/x/oauth2
-	    cloud.google.com/go/storage)
+	    cloud.google.com/go/storage
+	    github.com/mitchellh/go-homedir)
 
 message("Retrieving dependencies\n")
 
@@ -58,6 +59,8 @@ foreach (GG ${GO_GET})
   message("  Getting ${GG}")
   execute_process(COMMAND ${GO_BIN} get -d ${GG})
 endforeach()
+
+message("A\n")
 
 execute_process(COMMAND ${GO_BIN} get -u github.com/jteeuwen/go-bindata/...)
 
@@ -136,6 +139,8 @@ endif()
 
 add_custom_target(vcli ALL DEPENDS bin-data vcli_cmd date-release ${ABS_GO_SRCS})
 
+add_custom_target(vcli-install COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/automation/postinst DEPENDS vcli)
+
 ###
 ### install instructions
 ###
@@ -145,7 +150,6 @@ install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/vcli DESTINATION bin)
 
 set(CPACK_DEBIAN_PACKAGE_NAME vcli)
 set(CPACK_DEBIAN_PACKAGE_VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
-set(CPACK_DEBIAN_PACKAGE_DEPENDS "genext2fs")
 set(CPACK_DEBIAN_PACKAGE_DEPENDS "qemu-kvm")
 set(CPACK_PACKAGE_VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
 set(CPACK_PACKAGING_INSTALL_PREFIX /opt/sisatech/vorteil)
