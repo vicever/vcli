@@ -71,7 +71,7 @@ $ vcli --version
 
 ### Quickstart
 
-TODO
+Check out our [quickstart](http://vorteil.io/quickstart) guide to start using vcli and see for yourself what it can do!
 
 ### Compiling vcli
 
