@@ -10,7 +10,7 @@ project (vcli)
 
 set(VERSION_MAJOR 0)
 set(VERSION_MINOR 5)
-set(VERSION_PATCH 1)
+set(VERSION_PATCH 2)
 
 
 # check go binary exists in path
@@ -59,8 +59,6 @@ foreach (GG ${GO_GET})
   message("  Getting ${GG}")
   execute_process(COMMAND ${GO_BIN} get -d ${GG})
 endforeach()
-
-message("A\n")
 
 execute_process(COMMAND ${GO_BIN} get -u github.com/jteeuwen/go-bindata/...)
 

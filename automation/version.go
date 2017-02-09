@@ -17,7 +17,7 @@ package build
 const (
 	VersionMajor = "0"
 	VersionMinor = "5"
-	VersionPatch = "1"
-	Version = "0.5.1"
+	VersionPatch = "2"
+	Version = "0.5.2"
 	ReleaseName = ""
 )
