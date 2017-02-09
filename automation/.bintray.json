@@ -1,0 +1,22 @@
+{
+    "package": {
+        "name": "vcli",
+        "repo": "vorteil",
+        "subject": "sisatech"
+    },
+
+    "version": {
+        "name": "@VERSION_MAJOR@.@VERSION_MINOR@.@VERSION_PATCH@",
+        "desc": "vcli",
+        "released": "VRELEASE",
+        "gpgSign": true
+    },
+    "files":
+       [
+       {"includePattern": "vcli", "uploadPattern": "dev/vcli/@VERSION_MAJOR@.@VERSION_MINOR@.@VERSION_PATCH@/@CMAKE_SYSTEM_NAME@/vcli",
+         "matrixParams": {
+         "override": 1 }
+       }
+       ],
+    "publish": true
+}

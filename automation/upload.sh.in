@@ -1,0 +1,20 @@
+#!/bin/bash
+
+USER=jensg-st
+DIST=dev
+COMP=main
+VER=@VERSION_MAJOR@.@VERSION_MINOR@.@VERSION_PATCH@
+ORG=sisatech
+REPO=vorteil
+PACK=vcli
+ARCH=amd64
+DEB=$PACK-$VER-$1.deb
+DEB_URL="$PACK"_"$VER"_$ARCH.deb
+
+echo "uploading metadata to $REPO repository...\n"
+curl -fsS -v -u "jensg-st:$BINTRAY_APIKEY" -H "Content-Type:application/json" --data-binary '{ "list_in_downloads":true }' -X PUT "https://api.bintray.com/file_metadata/$ORG/$REPO/$DIST/$PACK/$VER/$1/vcli"
+
+if [ "$1" == "Linux" ]; then
+echo "uploading debian package to debian repository...\n"
+curl --header "X-Bintray-Debian-Distribution: $DIST" --header "X-Bintray-Debian-Component: $COMP" --header "X-Bintray-Debian-Architecture: $ARCH"  -T $DEB -u$USER:$BINTRAY_APIKEY "https://api.bintray.com/content/$ORG/deb/$PACK/$VER/pool/main/m/$DEB_URL?publish=1&override=1"
+fi

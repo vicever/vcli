@@ -1,0 +1,41 @@
+os:
+- linux
+- osx
+
+language: go
+
+sudo: false
+
+go:
+- 1.7
+
+env:
+  secure: k2K9jahN9Ve9ZNu3wZgoR4j08PLL/wElm0P0bpt49bE04ZBH2cR52ekO+d8N+6mEFd0kmC/C3pq1W33gVCtvZ8sUz839jgS2zLhsPc2FtwdhqJzqVAjLWsndyZJPFoPOk/UqKSVVEvsHnq/DnLSxuopIydIwTP0gBTTRCGjgRlM8RkB5sR/Hxc+cj+jN2lP1Pn3ltdbIp2tCDVCYUG1153HCuqfCGZqXdXYfSiRqtBg/UHFz28o/glRDI5V8M66VUf8zjah6VVrmBskz4WAB7mDt+GjQs06UnP8Zss9LWrq1sUrNaQg8McLNK6TJZse7Z+zQu/auQgaxJA+caPwl6dTB2O2wqtEtPuEkyxYJUZc/lzFoB1cXtEplap8r9J/8ZJJz1SgLGJOgFaOz/Vb3IAFR53Q2udWtVJXlXElJrn8WiyKcF/jmvdABr8Bhh+zSbV1MrVVWGj/VffARGChSUP7gUYrtPsH9dVHK0RVsC+gunXr/xm7C4/WK7IrCf5OvLSIgus6sg8CerH+E01QvTtqtgoaoHNIO13GhUcu786IrEXeQvTKPcyoMsmtQdWBbqtsLbYBMkQBBmuIxSsIJF9FP77B/NcNoZcV/cI7f3Wza6Y3nwOc+OCWw4AVfZX9/WJn9R8KdfJRscbhuj85Y8i+92lC/FHkOeCSln+MoUjg=
+
+before_install:
+ - go get github.com/mattn/goveralls
+
+install:
+ - go get -d -t -v ./...
+
+script:
+ - mkdir build && cd build
+ - cmake ..
+ - make vcli
+
+deploy:
+  provider: bintray
+  file: ".bintray.json"
+  skip_cleanup: true
+  user: jensg-st
+  key:
+    secure: jziyfovd7SWPtpjrCDglNMOzLOj7/hkPUGEdNrQtYMN0bJP/TPSyahubmFRhi/hYk8m00nm2LJByoWtOe3kByLF4B20yJ4ziwvu0aRA+0tzhlPAyP3Fq1IkkXDXEwpEccIZOJFeUWIt1ntJcAwxJ3RHBCkQo59ahVH5azFplioCTNdJYJVSQP/DtIJ30z0WgZtO6lPHr4Flie0nMeZA2sJZAcXKbrKlkkNqxq6D+aBVql2cLkjGvsbdE9qNoN2ZeIPSGZzLAjUdKqrPDM5+MQcPXwaFPnF2audchydF9HBQ5Q1hYJ3KVGpA1khAMGORFkUgrK81RRWR7c1PwW066rMPt+EqkNzuRN16DGnqte4QYVZrtwzj1J4EQUcviLcbgpXVjme/CiqMOuiwVdN/JZ+34fqTsh78Eua+Mfrj03RWs18rjHFXJv0vQZSAnSu3rfEN6kU0/S0JY5aJqVuPGbQ8pkz6cOEsWJPY8jYoCJPufKoWaHAJzytu4zp9YQVOrslDaUdNPG4PgpUTbna/WUOOsr6v/o9pw7TJVS0OnbIPW2btTUHd3bMha3qlqYPsPat0UkpguOJrxG+78HZhkRTxiH9K//8gISu9sx5FyGv29dzKT0F6W9knM00CbbhPWcYiYTPlzRlQ1UsdItoYciBH3EQZWyfbWYeUcyjZ8Gus=
+  dry-run: false
+
+after_deploy:
+ - echo "$TRAVIS_OS_NAME"
+ - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then make package ; fi
+ - chmod 755 upload.sh
+ - sleep 5
+ - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./upload.sh Darwin          ; fi
+ - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./upload.sh Linux         ; fi

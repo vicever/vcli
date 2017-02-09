@@ -1,0 +1,13 @@
+#!/bin/bash
+ln -f --symbolic /opt/sisatech/vorteil/bin/vcli /usr/bin/vcli
+
+# autocomplete script
+vcli --completion-script-bash > /tmp/bash_completion.d
+mv -f /tmp/bash_completion.d /etc/bash_completion.d/vcli
+
+# man pages
+vcli --help-man > /tmp/vcli.1
+gzip -f /tmp/vcli.1
+sudo mkdir -p /usr/local/share/man/man1
+sudo mv -f /tmp/vcli.1.gz /usr/local/share/man/man1/vcli.1.gz
+sudo mandb > /dev/null
