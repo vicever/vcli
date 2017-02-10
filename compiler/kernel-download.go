@@ -21,6 +21,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"runtime"
 	"strings"
 	"time"
 
@@ -199,8 +200,10 @@ func DownloadVorteilFile(dlFile, dlType string) error {
 					}
 
 				case <-t.C:
-					if inProgress > 0 {
-						fmt.Printf("\033[%dA\033[K", inProgress)
+					if runtime.GOOS == "linux" {
+						if inProgress > 0 {
+							fmt.Printf("\033[%dA\033[K", inProgress)
+						}
 					}
 
 					for i, resp := range responses {
@@ -221,7 +224,9 @@ func DownloadVorteilFile(dlFile, dlType string) error {
 					for _, resp := range responses {
 						if resp != nil {
 							inProgress++
-							fmt.Printf("Downloading %s %d / %d bytes (%d%%)\033[K\n", resp.Filename, resp.BytesTransferred(), resp.Size, int(100*resp.Progress()))
+							if runtime.GOOS == "linux" {
+								fmt.Printf("Downloading %s %d / %d bytes (%d%%)\033[K\n", resp.Filename, resp.BytesTransferred(), resp.Size, int(100*resp.Progress()))
+							}
 						}
 					}
 				}
