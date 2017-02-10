@@ -21,6 +21,7 @@ import (
 	"runtime"
 
 	homedir "github.com/mitchellh/go-homedir"
+	"github.com/sisatech/sherlock"
 )
 
 const (
@@ -97,6 +98,8 @@ func Initialize() error {
 			home = path.Join(usrHome, ".vorteil")
 
 		}
+
+		sherlock.Check(os.Setenv(envHome, home))
 
 	}
 
