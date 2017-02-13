@@ -475,7 +475,9 @@ func (cmd *Command) action(ctx *kingpin.ParseContext) error {
 		// TODO: check disk size is greater than files size
 
 		if cmd.persist == "" {
-			defer os.Remove(name)
+			if cmd.hypervisor != shared.VMwarePlayer && cmd.hypervisor != shared.VMwareWorkstation && cmd.hypervisor != shared.VMwareTest {
+				defer os.Remove(name)
+			}
 		}
 
 		err = cmd.start(name)
@@ -561,12 +563,12 @@ func (cmd *Command) start(disk string) error {
 	// cleanup vmware and virtual box
 	if cmd.hypervisor == shared.VMwarePlayer || cmd.hypervisor == shared.VMwareWorkstation || cmd.hypervisor == shared.VMwareTest {
 
-		defer os.RemoveAll(fullPath)
+		// defer os.RemoveAll(fullPath)
+		//
+		// command := exec.Command("vmrun", "deleteVM", args[len(args)-1])
+		// defer command.Run()
 
-		command := exec.Command("vmrun", "deleteVM", args[len(args)-1])
-		defer command.Run()
-
-		command = exec.Command("vmrun", "stop", args[len(args)-1], "hard")
+		command := exec.Command("vmrun", "stop", args[len(args)-1], "hard")
 		defer command.Run()
 
 	} else if cmd.hypervisor == shared.VirtualBox {

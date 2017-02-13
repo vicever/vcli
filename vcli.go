@@ -16,6 +16,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"runtime"
 
 	"github.com/alecthomas/kingpin"
 	"github.com/sisatech/vcli/automation"
@@ -63,6 +64,14 @@ func main() {
 	cmdrepo.New().Attach(app)
 	cmdcloud.New().Attach(app)
 	cmdsettings.New().Attach(app)
+
+	// set vmware path for mac
+	if runtime.GOOS == "darwin" {
+		binPath := "/Applications/VMware Fusion.app/Contents/Library"
+		env := os.Getenv("PATH")
+		env += ":" + binPath
+		os.Setenv("PATH", env)
+	}
 
 	// run
 	_, err := app.Parse(os.Args[1:])
