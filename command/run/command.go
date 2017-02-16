@@ -24,6 +24,7 @@ import (
 	"os/signal"
 	"path"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -674,10 +675,12 @@ func (cmd *Command) start(disk string) error {
 
 		if cmd.hypervisor == shared.VirtualBox {
 			// fmt.Println(f.Name())
-			cmD := exec.Command("VBoxManage", "controlvm", appName, "poweroff")
-			cmD.Run()
-			cmD = exec.Command("VBoxManage", "unregistervm", appName)
-			cmD.Run()
+			if runtime.GOOS != "darwin" {
+				cmD := exec.Command("VBoxManage", "controlvm", appName, "poweroff")
+				cmD.Run()
+				cmD = exec.Command("VBoxManage", "unregistervm", appName)
+				cmD.Run()
+			}
 
 			if cmd.echo {
 				os.Remove(vBoxSerial.Name())
