@@ -1,6 +1,14 @@
 ![travis](https://travis-ci.com/sisatech/vcli.svg?token=WUCPibz6S35grkdsjMDz&branch=master)
-# Vorteil Command-Line Interface (part of the [Vorteil](http://vorteil.io) ecosystem)
+# Vorteil
 *License: Apache 2.0*
+
+The lightweight Vorteil Kernel is used to compile Go apps into bootable virtual disks for microservices and immutable infrastructure. Using a unikernel approach, the Vorteil Kernel has virtually zero run-time overhead and boots up in a matter of milliseconds.
+
+vorteil.io in action:
+
+[![Booting vorteil](https://img.youtube.com/vi/NKjCnMLd-Rs/0.jpg)](https://www.youtube.com/watch?v=NKjCnMLd-Rs)
+
+# Vorteil CLI
 
 The Vorteil Command-Line Interface (vcli) is the only tool you'll ever need to develop, test, build, and deploy vorteil-os applications for the cloud.
 
