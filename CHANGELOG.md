@@ -1,6 +1,6 @@
 #CHANGELOG
 
-## [0.5.5] - 2017-02-16
+## 0.5.5 - 2017-02-16
 ### Added
 - VMware Fusion support for Mac OS
 - Several unit tests
