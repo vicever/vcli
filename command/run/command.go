@@ -265,7 +265,7 @@ func (cmd *Command) firstTimeKernel() error {
 func (cmd *Command) validateArgs() error {
 
 	// check config file is up to date ...
-	err := shared.VCFGHealthCheck(home.Path(home.Repository), cmd.binary)
+	err := shared.VCFGHealthCheck(home.Path(home.Repository), cmd.binary, false)
 	if err != nil {
 		return err
 	}

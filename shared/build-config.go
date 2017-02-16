@@ -86,7 +86,7 @@ type Redirect struct {
 	Protocol string `yaml:"protocol" json:"protocol,omitempty" nav:"protocol"`
 }
 
-func VCFGHealthCheck(home, path string) error {
+func VCFGHealthCheck(home, path string, force bool) error {
 
 	// Unmarshal the target vcfg file
 	// If any of the fields are NULL
@@ -143,20 +143,22 @@ func VCFGHealthCheck(home, path string) error {
 
 	if nullsFound {
 		if !repo {
-			fmt.Println(Catenate(`The config file '` + path + `' is from an older
-				version of VCLI and must be fixed before the current operation
-				can continue. Should VCLI automatically fix the config file? [y/n]`))
-			var input string
-			for {
-				n, err := fmt.Scanln(&input)
-				if err != nil || n != 1 {
-					continue
-				}
-				if input == "n" {
-					return errors.New("user opted out of vcfg file repair. Aborting operation.")
-				} else {
-					if input == "y" {
-						break
+			if !force {
+				fmt.Println(Catenate(`The config file '` + path + `' is from an older
+					version of VCLI and must be fixed before the current operation
+					can continue. Should VCLI automatically fix the config file? [y/n]`))
+				var input string
+				for {
+					n, err := fmt.Scanln(&input)
+					if err != nil || n != 1 {
+						continue
+					}
+					if input == "n" {
+						return errors.New("user opted out of vcfg file repair. Aborting operation.")
+					} else {
+						if input == "y" {
+							break
+						}
 					}
 				}
 			}

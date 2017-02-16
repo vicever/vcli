@@ -111,3 +111,19 @@ func ValidHypervisor(hypervisor string) bool {
 	return false
 
 }
+
+// ValidHypervisorWithHidden
+func ValidHypervisorWithHidden(hypervisor string) bool {
+
+	vals := ListDetectedHypervisorsWithHidden()
+	for _, x := range vals {
+
+		if x == hypervisor {
+			return true
+		}
+
+	}
+
+	return false
+
+}

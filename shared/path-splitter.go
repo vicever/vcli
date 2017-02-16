@@ -13,27 +13,25 @@
 // limitations under the License.
 package shared
 
-import "strings"
+import (
+	"path"
+	"strings"
+)
 
 // NodeName returns the end-name of a node within a path.
-func NodeName(path string) string {
+func NodeName(input string) string {
 
-	nodes := strings.Split(path, "/")
-	return nodes[len(nodes)-1]
+	nodes := path.Base(input)
+	return nodes
 
 }
 
 // NodeParent returns the path to the parent parent node.
-func NodeParent(path string) string {
+func NodeParent(input string) string {
 
-	nodes := strings.Split(path, "/")
-
-	if len(nodes) == 1 {
-
-		return ""
-
-	}
-
-	return strings.TrimSuffix(path, nodes[len(nodes)-1])
+	nodes := path.Base(input)
+	nodes = "/" + nodes
+	input = strings.TrimSuffix(input, nodes)
+	return input
 
 }
