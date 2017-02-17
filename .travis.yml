@@ -7,29 +7,34 @@ language: go
 sudo: false
 
 go:
-- 1.7
+ - 1.7
 
 env:
-  secure: k2K9jahN9Ve9ZNu3wZgoR4j08PLL/wElm0P0bpt49bE04ZBH2cR52ekO+d8N+6mEFd0kmC/C3pq1W33gVCtvZ8sUz839jgS2zLhsPc2FtwdhqJzqVAjLWsndyZJPFoPOk/UqKSVVEvsHnq/DnLSxuopIydIwTP0gBTTRCGjgRlM8RkB5sR/Hxc+cj+jN2lP1Pn3ltdbIp2tCDVCYUG1153HCuqfCGZqXdXYfSiRqtBg/UHFz28o/glRDI5V8M66VUf8zjah6VVrmBskz4WAB7mDt+GjQs06UnP8Zss9LWrq1sUrNaQg8McLNK6TJZse7Z+zQu/auQgaxJA+caPwl6dTB2O2wqtEtPuEkyxYJUZc/lzFoB1cXtEplap8r9J/8ZJJz1SgLGJOgFaOz/Vb3IAFR53Q2udWtVJXlXElJrn8WiyKcF/jmvdABr8Bhh+zSbV1MrVVWGj/VffARGChSUP7gUYrtPsH9dVHK0RVsC+gunXr/xm7C4/WK7IrCf5OvLSIgus6sg8CerH+E01QvTtqtgoaoHNIO13GhUcu786IrEXeQvTKPcyoMsmtQdWBbqtsLbYBMkQBBmuIxSsIJF9FP77B/NcNoZcV/cI7f3Wza6Y3nwOc+OCWw4AVfZX9/WJn9R8KdfJRscbhuj85Y8i+92lC/FHkOeCSln+MoUjg=
+  global:
+    # GH_DEPLOYMENT_TOKEN
+    secure: fhBR7MqAJPoPSxMfCy3VHWoTk8fdJgXeQyQuqDIVC5XYTPj8xFIfqbLz+6mfmfl6I+g7657Q6HsZ35T40bWNPPMw8GyDlJpR3Q5pwl6X6z8TDYkfDz5m8q7DRWNU5QxIf1ahgyHH3Jc7Edb5Y/WNCXym73q86UVw+4aqV5G7fCx/3tbQyRutNv9sKIpzRY0Tns4Lb2QfAR/7xnWqX1kWOTQCJEa0ijSm+syDLL1CiKRGo/RChqNVt0MJz1H1RU2F6Tad9t3cTeQ0awJvtf3veXFgW6Nj/CNVObzLCtVu1hJjIoWxwVT404avjHd2nsRa9mg15FA1/ZkYT5qwM8/3F0ev6erumU32D4RYMra5TxpEDsGD0SXWg9jrFiQB860tZuXj8AqxcmCw+NH9Ib6C/Jl9KwD6Z/vimfop/1B5W+UJ4+ZUIdihXJl0AAD4MBurFX77/YJfCd2VJgp+ZG49VLBNaPj+Yu3UW+WxTjidpKjj6UMpOiyLGGTN/WTV5FLD0fR3TquMycvjlvAchb4he3+zn3f7SmNs2wEl2aH6izfzOjkme69SiB5Uxs2ISSgv6SsVqjkb1vR3aWGQAW+5ZXG04aK8MANwUkIwYD/bzGJeHQOpYOjQjbFVCMizMgG78U9hHO+fjNujHJedxlulwAZ1TffkgA0+RG2+JytSp/A=
 
 before_install:
  - go get github.com/mattn/goveralls
- - go get -d -t -v ./...
 
 install:
  - mkdir build && cd build
  - cmake ..
+
+before_script:
  - chmod 755 upload.sh
+
+script:
  - make vcli
 
-# script:
-#  - mkdir build && cd build
-#  - cmake ..
-#  - make vcli
-#  - echo "$TRAVIS_OS_NAME"
-#  - chmod 755 upload.sh
-#  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./upload.sh Darwin          ; fi
-#  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./upload.sh Linux         ; fi
+after_success:
+ - echo "PASS"
+ - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./upload.sh Linux         ; fi
+
+after_failure:
+ - echo "FAIL"
+
+before_deploy:
 
 deploy:
   provider: bintray
@@ -41,9 +46,11 @@ deploy:
   dry-run: false
 
 after_deploy:
- - echo "$TRAVIS_OS_NAME"
- - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then make package ; fi
- - chmod 755 upload.sh
- - sleep 5
- - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./upload.sh Darwin          ; fi
- - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./upload.sh Linux         ; fi
+- echo "$TRAVIS_OS_NAME"
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then make package ; fi
+- chmod 755 upload.sh
+- sleep 5
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./upload.sh Darwin          ; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./upload.sh Linux         ; fi
+
+after_script:
