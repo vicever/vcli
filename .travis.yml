@@ -29,7 +29,8 @@ script:
 
 after_success:
  - echo "PASS"
- - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./upload.sh Linux         ; fi
+ - echo $GH_DEPLOYMENT_TOKEN
+ - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./upload.sh Linux $GH_DEPLOYMENT_TOKEN        ; fi
 
 after_failure:
  - echo "FAIL"
