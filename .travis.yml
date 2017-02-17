@@ -29,29 +29,29 @@ script:
 
 after_success:
  - echo "PASS"
- - secure: fhBR7MqAJPoPSxMfCy3VHWoTk8fdJgXeQyQuqDIVC5XYTPj8xFIfqbLz+6mfmfl6I+g7657Q6HsZ35T40bWNPPMw8GyDlJpR3Q5pwl6X6z8TDYkfDz5m8q7DRWNU5QxIf1ahgyHH3Jc7Edb5Y/WNCXym73q86UVw+4aqV5G7fCx/3tbQyRutNv9sKIpzRY0Tns4Lb2QfAR/7xnWqX1kWOTQCJEa0ijSm+syDLL1CiKRGo/RChqNVt0MJz1H1RU2F6Tad9t3cTeQ0awJvtf3veXFgW6Nj/CNVObzLCtVu1hJjIoWxwVT404avjHd2nsRa9mg15FA1/ZkYT5qwM8/3F0ev6erumU32D4RYMra5TxpEDsGD0SXWg9jrFiQB860tZuXj8AqxcmCw+NH9Ib6C/Jl9KwD6Z/vimfop/1B5W+UJ4+ZUIdihXJl0AAD4MBurFX77/YJfCd2VJgp+ZG49VLBNaPj+Yu3UW+WxTjidpKjj6UMpOiyLGGTN/WTV5FLD0fR3TquMycvjlvAchb4he3+zn3f7SmNs2wEl2aH6izfzOjkme69SiB5Uxs2ISSgv6SsVqjkb1vR3aWGQAW+5ZXG04aK8MANwUkIwYD/bzGJeHQOpYOjQjbFVCMizMgG78U9hHO+fjNujHJedxlulwAZ1TffkgA0+RG2+JytSp/A=
- - curl -X POST -H 'Authorization: token $GH_DEPLOYMENT_TOKEN' --data '{"tag_name":"autotest","target_commitish":"master","name":"autotest2","body":"Automatically generated release.","draft":true,"prerelease":true}' https://api.github.com/repos/sisatech/vcli/releases
+ - echo $GH_DEPLOYMENT_TOKEN
+ - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./upload.sh Linux $GH_DEPLOYMENT_TOKEN        ; fi
 
 after_failure:
  - echo "FAIL"
 
 before_deploy:
 
-# deploy:
-#   provider: bintray
-#   file: ".bintray.json"
-#   skip_cleanup: true
-#   user: jensg-st
-#   key:
-#     secure: jziyfovd7SWPtpjrCDglNMOzLOj7/hkPUGEdNrQtYMN0bJP/TPSyahubmFRhi/hYk8m00nm2LJByoWtOe3kByLF4B20yJ4ziwvu0aRA+0tzhlPAyP3Fq1IkkXDXEwpEccIZOJFeUWIt1ntJcAwxJ3RHBCkQo59ahVH5azFplioCTNdJYJVSQP/DtIJ30z0WgZtO6lPHr4Flie0nMeZA2sJZAcXKbrKlkkNqxq6D+aBVql2cLkjGvsbdE9qNoN2ZeIPSGZzLAjUdKqrPDM5+MQcPXwaFPnF2audchydF9HBQ5Q1hYJ3KVGpA1khAMGORFkUgrK81RRWR7c1PwW066rMPt+EqkNzuRN16DGnqte4QYVZrtwzj1J4EQUcviLcbgpXVjme/CiqMOuiwVdN/JZ+34fqTsh78Eua+Mfrj03RWs18rjHFXJv0vQZSAnSu3rfEN6kU0/S0JY5aJqVuPGbQ8pkz6cOEsWJPY8jYoCJPufKoWaHAJzytu4zp9YQVOrslDaUdNPG4PgpUTbna/WUOOsr6v/o9pw7TJVS0OnbIPW2btTUHd3bMha3qlqYPsPat0UkpguOJrxG+78HZhkRTxiH9K//8gISu9sx5FyGv29dzKT0F6W9knM00CbbhPWcYiYTPlzRlQ1UsdItoYciBH3EQZWyfbWYeUcyjZ8Gus=
-#   dry-run: false
-#
-# after_deploy:
-# - echo "$TRAVIS_OS_NAME"
-# - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then make package ; fi
-# - chmod 755 upload.sh
-# - sleep 5
-# - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./upload.sh Darwin          ; fi
-# - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./upload.sh Linux         ; fi
+deploy:
+  provider: bintray
+  file: ".bintray.json"
+  skip_cleanup: true
+  user: jensg-st
+  key:
+    secure: jziyfovd7SWPtpjrCDglNMOzLOj7/hkPUGEdNrQtYMN0bJP/TPSyahubmFRhi/hYk8m00nm2LJByoWtOe3kByLF4B20yJ4ziwvu0aRA+0tzhlPAyP3Fq1IkkXDXEwpEccIZOJFeUWIt1ntJcAwxJ3RHBCkQo59ahVH5azFplioCTNdJYJVSQP/DtIJ30z0WgZtO6lPHr4Flie0nMeZA2sJZAcXKbrKlkkNqxq6D+aBVql2cLkjGvsbdE9qNoN2ZeIPSGZzLAjUdKqrPDM5+MQcPXwaFPnF2audchydF9HBQ5Q1hYJ3KVGpA1khAMGORFkUgrK81RRWR7c1PwW066rMPt+EqkNzuRN16DGnqte4QYVZrtwzj1J4EQUcviLcbgpXVjme/CiqMOuiwVdN/JZ+34fqTsh78Eua+Mfrj03RWs18rjHFXJv0vQZSAnSu3rfEN6kU0/S0JY5aJqVuPGbQ8pkz6cOEsWJPY8jYoCJPufKoWaHAJzytu4zp9YQVOrslDaUdNPG4PgpUTbna/WUOOsr6v/o9pw7TJVS0OnbIPW2btTUHd3bMha3qlqYPsPat0UkpguOJrxG+78HZhkRTxiH9K//8gISu9sx5FyGv29dzKT0F6W9knM00CbbhPWcYiYTPlzRlQ1UsdItoYciBH3EQZWyfbWYeUcyjZ8Gus=
+  dry-run: false
+
+after_deploy:
+- echo "$TRAVIS_OS_NAME"
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then make package ; fi
+- chmod 755 upload.sh
+- sleep 5
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./upload.sh Darwin          ; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./upload.sh Linux         ; fi
 
 after_script:

@@ -17,50 +17,50 @@ echo "uploading binary to git release draft $REL..."
 
 echo $2
 
-if [curl -H 'Authorization: token $GH_DEPLOYMENT_TOKEN' alankm: https://api.github.com/repos/sisatech/vcli/releases/tags/$REL 2>&1 | grep '"message": "Not Found"']; then
+# if [curl -H 'Authorization: token $GH_DEPLOYMENT_TOKEN' alankm: https://api.github.com/repos/sisatech/vcli/releases/tags/$REL 2>&1 | grep '"message": "Not Found"']; then
 	echo "release not found, creating..."
-	curl -X POST -H 'Authorization: token $2' --data '{"tag_name":"$REL","target_commitish":"master","name":"$REL","body":"Automatically generated release.","draft":true,"prerelease":true}' https://api.github.com/repos/sisatech/vcli/releases
-fi
-
-echo "A"
-
-ID=$(curl -H 'Authorization: token $GH_DEPLOYMENT_TOKEN' https://api.github.com/repos/sisatech/vcli/releases/tags/$REL 2>&1 | grep '"id":' | head -1 | tr -d '[:space:][,]' | cut -d':' -f2)
-
-echo "B"
-
-if [ "$1" == "Linux" ]; then
-TARNAME=$REL-linux.tar.gz
-fi
-
-echo "C"
-
-if [ "$1" != "Linux" ]; then
-TARNAME=$REL-darwin.tar.gz
-fi
-
-echo "D"
-
-tar -czvf $TARNAME $PACK
-echo "uploading binary..."
-curl -X POST -H 'Authorization: token $GH_DEPLOYMENT_TOKEN' https://api.github.com/repos/sisatech/vcli/releases/$ID/assets?name=$TARNAME --data @$TARNAME
-
-# upload binary to google cloud
-echo "downloading quickstart package from google cloud..."
-
-curl https://storage.googleapis.com/vorteil/vcli-demo-platforms/demo.tar.gz > quickstart.tar.gz
-
-tar -xzvf quickstart.tar.gz
-
-cp $PACK demo/vcli
-
-if [ "$1" == "Linux" ]; then
-TARNAME=test_vcli_linux.tar.gz
-fi
-
-if [ "$1" != "Linux" ]; then
-TARNAME=test_vcli_darwin.tar.gz
-fi
-
-tar -czvf vcli_linux.tar.gz demo
-
-curl -X POST --data @$TARNAME https://www.googleapis.com/upload/storage/v1/b/vorteil/o?uploadType=media&name=vcli-demo-platforms/$TARNAME
+	curl -X POST -H 'Authorization: token $GH_DEPLOYMENT_TOKEN' --data '{"tag_name":"$REL","target_commitish":"master","name":"$REL","body":"Automatically generated release.","draft":true,"prerelease":true}' https://api.github.com/repos/sisatech/vcli/releases
+# fi
+#
+# echo "A"
+#
+# ID=$(curl -H 'Authorization: token $GH_DEPLOYMENT_TOKEN' https://api.github.com/repos/sisatech/vcli/releases/tags/$REL 2>&1 | grep '"id":' | head -1 | tr -d '[:space:][,]' | cut -d':' -f2)
+#
+# echo "B"
+#
+# if [ "$1" == "Linux" ]; then
+# TARNAME=$REL-linux.tar.gz
+# fi
+#
+# echo "C"
+#
+# if [ "$1" != "Linux" ]; then
+# TARNAME=$REL-darwin.tar.gz
+# fi
+#
+# echo "D"
+#
+# tar -czvf $TARNAME $PACK
+# echo "uploading binary..."
+# curl -X POST -H 'Authorization: token $GH_DEPLOYMENT_TOKEN' https://api.github.com/repos/sisatech/vcli/releases/$ID/assets?name=$TARNAME --data @$TARNAME
+#
+# # upload binary to google cloud
+# echo "downloading quickstart package from google cloud..."
+#
+# curl https://storage.googleapis.com/vorteil/vcli-demo-platforms/demo.tar.gz > quickstart.tar.gz
+#
+# tar -xzvf quickstart.tar.gz
+#
+# cp $PACK demo/vcli
+#
+# if [ "$1" == "Linux" ]; then
+# TARNAME=test_vcli_linux.tar.gz
+# fi
+#
+# if [ "$1" != "Linux" ]; then
+# TARNAME=test_vcli_darwin.tar.gz
+# fi
+#
+# tar -czvf vcli_linux.tar.gz demo
+#
+# curl -X POST --data @$TARNAME https://www.googleapis.com/upload/storage/v1/b/vorteil/o?uploadType=media&name=vcli-demo-platforms/$TARNAME
