@@ -11,6 +11,7 @@ go:
 
 env:
   secure: k2K9jahN9Ve9ZNu3wZgoR4j08PLL/wElm0P0bpt49bE04ZBH2cR52ekO+d8N+6mEFd0kmC/C3pq1W33gVCtvZ8sUz839jgS2zLhsPc2FtwdhqJzqVAjLWsndyZJPFoPOk/UqKSVVEvsHnq/DnLSxuopIydIwTP0gBTTRCGjgRlM8RkB5sR/Hxc+cj+jN2lP1Pn3ltdbIp2tCDVCYUG1153HCuqfCGZqXdXYfSiRqtBg/UHFz28o/glRDI5V8M66VUf8zjah6VVrmBskz4WAB7mDt+GjQs06UnP8Zss9LWrq1sUrNaQg8McLNK6TJZse7Z+zQu/auQgaxJA+caPwl6dTB2O2wqtEtPuEkyxYJUZc/lzFoB1cXtEplap8r9J/8ZJJz1SgLGJOgFaOz/Vb3IAFR53Q2udWtVJXlXElJrn8WiyKcF/jmvdABr8Bhh+zSbV1MrVVWGj/VffARGChSUP7gUYrtPsH9dVHK0RVsC+gunXr/xm7C4/WK7IrCf5OvLSIgus6sg8CerH+E01QvTtqtgoaoHNIO13GhUcu786IrEXeQvTKPcyoMsmtQdWBbqtsLbYBMkQBBmuIxSsIJF9FP77B/NcNoZcV/cI7f3Wza6Y3nwOc+OCWw4AVfZX9/WJn9R8KdfJRscbhuj85Y8i+92lC/FHkOeCSln+MoUjg=
+  secure: x19Z/cao7sDPGRz+2XvGJ01L5Ten9lEN7FKPcS+f1PJQockdMTOSuYzWBn7edzo5qNyEy+CHZ1hxu4iE0O/4q76PH+dmNBzDNmIyEaDjjf5LnA9k9y1L2cmpROlkXOuzmNxr7P6mZJrlRIfMpJ9uRyqKLCrz0qm027zix3Qn2bnVlf7MYZe9qVCkVNKYgUe1kRA/23qSlRb20zC+CKolyYgUOSLmxp/wtFdvkAsUZCCb2SR+1Udx73bgfmi22ZVn9K1JF8NccBD62773XfdegZHsS4u/pq63k6OHBDOVWwTouwxv3kTdBk9jmwoJBWVWVisB8qBkkGvnH0SeROON3WjbTasIOm5S8l7oFFjCoH1HIFI516xrtNQlgFSWgrNdswToeH6ixljZhHH/sU+PQuasoc5RBlpRrHQGPNvcOAZHyq6nzwz7Yd0a0OWU8fPK+4E2jek9/lR+quB3e+DhwvdsvdhtoYzUlhGMtUacROB7BdbZZfwKGkB9O+P0YAtt0L+pHlm4NK5hrs3WF7dshIq1w6/QeJ26lyTfqTfgdorf5/cv1SHufYQFHS9DADU5aJnVHGxUfhz8rK3dHgVEHhEEJf1zBdG1UPBjRh7Tuuub5j0pMsjT25tEjGc3pHlhmQw7jCVJM4YdFQZWUH0S5cvuGXud24C8ENO8uxGYsxQ=
 
 before_install:
  - go get github.com/mattn/goveralls
@@ -22,6 +23,8 @@ script:
  - mkdir build && cd build
  - cmake ..
  - make vcli
+ - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./upload.sh Darwin          ; fi
+ - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./upload.sh Linux         ; fi
 
 deploy:
   provider: bintray

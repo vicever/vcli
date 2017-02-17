@@ -29,7 +29,7 @@ import (
 	"github.com/sisatech/vcli/home"
 )
 
-func maintentionalbugin() {
+func main() {
 
 	defer func() {
 
