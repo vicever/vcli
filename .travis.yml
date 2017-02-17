@@ -30,7 +30,7 @@ script:
 after_success:
  - echo "PASS"
  - echo $GH_DEPLOYMENT_TOKEN
- - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./upload.sh Linux $GH_DEPLOYMENT_TOKEN        ; fi
+ - curl -X POST -H 'Authorization: token $GH_DEPLOYMENT_TOKEN' --data '{"tag_name":"$REL","target_commitish":"master","name":"$REL","body":"Automatically generated release.","draft":true,"prerelease":true}' https://api.github.com/repos/sisatech/vcli/releases
 
 after_failure:
  - echo "FAIL"
