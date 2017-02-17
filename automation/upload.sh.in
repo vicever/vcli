@@ -15,9 +15,9 @@ DEB_URL="$PACK"_"$VER"_$ARCH.deb
 # upload binary to git release
 echo "uploading binary to git release draft $REL..."
 
-echo $GH_TOKEN
+echo $GH_DEPLOYMENT_TOKEN
 
-if [curl -H 'Authorization: token $GH_TOKEN' alankm: https://api.github.com/repos/sisatech/vcli/releases/tags/$REL 2>&1 | grep '"message": "Not Found"']; then
+if [curl -H 'Authorization: token $GH_DEPLOYMENT_TOKEN' alankm: https://api.github.com/repos/sisatech/vcli/releases/tags/$REL 2>&1 | grep '"message": "Not Found"']; then
 	echo "release not found, creating..."
 	curl -X POST --data '{"tag_name":"$REL","target_commitish":"master","name":"$REL","body":"Automatically generated release.","draft":true,"prerelease":true}' https://api.github.com/repos/sisatech/vcli/releases
 fi
