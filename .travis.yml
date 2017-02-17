@@ -23,6 +23,8 @@ script:
  - mkdir build && cd build
  - cmake ..
  - make vcli
+ - echo "$TRAVIS_OS_NAME"
+ - chmod 755 upload.sh
  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./upload.sh Darwin          ; fi
  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./upload.sh Linux         ; fi
 
