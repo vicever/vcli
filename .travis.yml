@@ -29,7 +29,8 @@ script:
 
 after_success:
  - echo "PASS"
- - curl -X POST -H 'Authorization: token $GH_DEPLOYMENT_TOKEN' --data '{"tag_name":"$REL","target_commitish":"master","name":"$REL","body":"Automatically generated release.","draft":true,"prerelease":true}' https://api.github.com/repos/sisatech/vcli/releases
+ - secure: fhBR7MqAJPoPSxMfCy3VHWoTk8fdJgXeQyQuqDIVC5XYTPj8xFIfqbLz+6mfmfl6I+g7657Q6HsZ35T40bWNPPMw8GyDlJpR3Q5pwl6X6z8TDYkfDz5m8q7DRWNU5QxIf1ahgyHH3Jc7Edb5Y/WNCXym73q86UVw+4aqV5G7fCx/3tbQyRutNv9sKIpzRY0Tns4Lb2QfAR/7xnWqX1kWOTQCJEa0ijSm+syDLL1CiKRGo/RChqNVt0MJz1H1RU2F6Tad9t3cTeQ0awJvtf3veXFgW6Nj/CNVObzLCtVu1hJjIoWxwVT404avjHd2nsRa9mg15FA1/ZkYT5qwM8/3F0ev6erumU32D4RYMra5TxpEDsGD0SXWg9jrFiQB860tZuXj8AqxcmCw+NH9Ib6C/Jl9KwD6Z/vimfop/1B5W+UJ4+ZUIdihXJl0AAD4MBurFX77/YJfCd2VJgp+ZG49VLBNaPj+Yu3UW+WxTjidpKjj6UMpOiyLGGTN/WTV5FLD0fR3TquMycvjlvAchb4he3+zn3f7SmNs2wEl2aH6izfzOjkme69SiB5Uxs2ISSgv6SsVqjkb1vR3aWGQAW+5ZXG04aK8MANwUkIwYD/bzGJeHQOpYOjQjbFVCMizMgG78U9hHO+fjNujHJedxlulwAZ1TffkgA0+RG2+JytSp/A=
+ - curl -X POST -H 'Authorization: token $GH_DEPLOYMENT_TOKEN' --data '{"tag_name":"autotest","target_commitish":"master","name":"autotest2","body":"Automatically generated release.","draft":true,"prerelease":true}' https://api.github.com/repos/sisatech/vcli/releases
 
 after_failure:
  - echo "FAIL"
