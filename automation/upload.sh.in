@@ -19,12 +19,12 @@ echo $GH_DEPLOYMENT_TOKEN
 
 if [curl -H 'Authorization: token $GH_DEPLOYMENT_TOKEN' alankm: https://api.github.com/repos/sisatech/vcli/releases/tags/$REL 2>&1 | grep '"message": "Not Found"']; then
 	echo "release not found, creating..."
-	curl -X POST --data '{"tag_name":"$REL","target_commitish":"master","name":"$REL","body":"Automatically generated release.","draft":true,"prerelease":true}' https://api.github.com/repos/sisatech/vcli/releases
+	curl -X POST -H 'Authorization: token $GH_DEPLOYMENT_TOKEN' --data '{"tag_name":"$REL","target_commitish":"master","name":"$REL","body":"Automatically generated release.","draft":true,"prerelease":true}' https://api.github.com/repos/sisatech/vcli/releases
 fi
 
 echo "A"
 
-ID=$(curl https://api.github.com/repos/sisatech/vcli/releases/tags/$REL 2>&1 | grep '"id":' | head -1 | tr -d '[:space:][,]' | cut -d':' -f2)
+ID=$(curl -H 'Authorization: token $GH_DEPLOYMENT_TOKEN' https://api.github.com/repos/sisatech/vcli/releases/tags/$REL 2>&1 | grep '"id":' | head -1 | tr -d '[:space:][,]' | cut -d':' -f2)
 
 echo "B"
 
@@ -42,7 +42,7 @@ echo "D"
 
 tar -czvf $TARNAME $PACK
 echo "uploading binary..."
-curl -X POST https://api.github.com/repos/sisatech/vcli/releases/$ID/assets?name=$TARNAME --data @$TARNAME
+curl -X POST -H 'Authorization: token $GH_DEPLOYMENT_TOKEN' https://api.github.com/repos/sisatech/vcli/releases/$ID/assets?name=$TARNAME --data @$TARNAME
 
 # upload binary to google cloud
 echo "downloading quickstart package from google cloud..."
