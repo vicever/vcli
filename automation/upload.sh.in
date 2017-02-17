@@ -3,7 +3,7 @@
 USER=jensg-st
 DIST=dev
 COMP=main
-VER=@VERSION_MAJOR@.@VERSION_MINOR@.@VERSION_PATCH@
+VER=test-@VERSION_MAJOR@.@VERSION_MINOR@.@VERSION_PATCH@
 REL=v$VER-alpha
 ORG=sisatech
 REPO=vorteil
@@ -67,11 +67,11 @@ tar -xzvf quickstart.tar.gz
 cp $PACK demo/vcli
 
 if [ "$1" == "Linux" ]; then
-TARNAME=vcli_linux.tar.gz
+TARNAME=test_vcli_linux.tar.gz
 fi
 
 if [ "$1" != "Linux" ]; then
-TARNAME=vcli_darwin.tar.gz
+TARNAME=test_vcli_darwin.tar.gz
 fi
 
 tar -czvf vcli_linux.tar.gz demo
