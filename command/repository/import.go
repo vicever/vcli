@@ -31,11 +31,12 @@ import (
 
 type cmdImport struct {
 	*kingpin.CmdClause
-	src   string
-	files string
-	icon  string
-	addr  string
-	tag   string
+	src    string
+	files  string
+	icon   string
+	addr   string
+	tag    string
+	config string
 }
 
 // New ...
@@ -83,6 +84,11 @@ func (cmd *cmdImport) Attach(parent command.Node) {
 	flag = cmd.Flag("tag", shared.Catenate(`Tag the new version of the app
 		during the import process with the provided name.`))
 	flag.StringVar(&cmd.tag)
+
+	flag = cmd.Flag("config", shared.Catenate(`Override the default config
+		file associated with the app. Specifies path to desired config.`))
+	flag.Short('c')
+	flag.StringVar(&cmd.config)
 
 	cmd.Action(cmd.action)
 
@@ -194,7 +200,12 @@ func (cmd *cmdImport) action(ctx *kingpin.ParseContext) error {
 			cmd.addr = strings.TrimPrefix(cmd.addr, shared.RepoPrefix)
 		}
 
-		config := cmd.src + ".vcfg"
+		var config string
+		if cmd.config == "" {
+			config = cmd.src + ".vcfg"
+		} else {
+			config = cmd.config
+		}
 
 		// load input
 		var in converter.Convertible

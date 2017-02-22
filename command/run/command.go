@@ -62,6 +62,7 @@ type Command struct {
 	headless   bool
 	echo       bool
 	tempdir    bool
+	config     string
 }
 
 // New ...
@@ -136,6 +137,11 @@ func (cmd *Command) Attach(parent command.Node) {
 	flag = cmd.Flag("port-map", shared.Catenate(`Must be in the format "x:y:z" where x = Network Card number, y = the Host Port, and x = the Guest Port.
 		Mappings should be separated with a ',' (ie. --port-map=x:y:z,a:b:c)'`))
 	flag.StringVar(&cmd.pmap)
+
+	flag = cmd.Flag("config", shared.Catenate(`Override the default config
+		file associated with the app. Specifies path to desired config.`))
+	flag.Short('c')
+	flag.StringVar(&cmd.config)
 
 	cmd.Action(cmd.action)
 
@@ -266,7 +272,10 @@ func (cmd *Command) firstTimeKernel() error {
 func (cmd *Command) validateArgs() error {
 
 	// check config file is up to date ...
-	err := shared.VCFGHealthCheck(home.Path(home.Repository), cmd.binary, false)
+	if cmd.config == "" {
+		cmd.config = cmd.binary + ".vcfg"
+	}
+	err := shared.VCFGHealthCheck(home.Path(home.Repository), cmd.config, false)
 	if err != nil {
 		return err
 	}
@@ -400,7 +409,7 @@ func (cmd *Command) action(ctx *kingpin.ParseContext) error {
 
 		// TODO: support launching any and all of the supported formats
 		// TODO: argument validation
-		config := cmd.binary + ".vcfg"
+		config := cmd.config
 
 		// load input
 		var in converter.Convertible
@@ -564,11 +573,8 @@ func (cmd *Command) start(disk string) error {
 	// cleanup vmware and virtual box
 	if cmd.hypervisor == shared.VMwarePlayer || cmd.hypervisor == shared.VMwareWorkstation || cmd.hypervisor == shared.VMwareTest {
 
-		// defer os.RemoveAll(fullPath)
-		//
-		// command := exec.Command("vmrun", "deleteVM", args[len(args)-1])
-		// defer command.Run()
-
+		// Prevents VCLI from cleaning up VMware Fusion instances after
+		// run process ends
 		if runtime.GOOS != "darwin" {
 			command := exec.Command("vmrun", "stop", args[len(args)-1], "hard")
 			defer command.Run()
@@ -629,7 +635,6 @@ func (cmd *Command) start(disk string) error {
 			command.Stdout = &errS
 			go cmd.serialOut()
 		}
-
 		err = command.Run()
 
 		fmt.Printf("\n%v", command.Stderr)

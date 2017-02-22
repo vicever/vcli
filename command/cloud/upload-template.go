@@ -65,6 +65,7 @@ type cmdUploadTemplate struct {
 	argProvided  bool
 	argValidated bool
 
+	config string
 	name   string
 	files  string
 	kernel string
@@ -117,37 +118,42 @@ func (cmd *cmdUploadTemplate) Attach(parent command.Node) {
 	clause.Default(home.GlobalDefaults.Infrastructure)
 	// clause.PreAction(cmd.preaction)
 
-	nameflag := cmd.Flag("name", shared.Catenate(`Specifies name for new template.`))
-	nameflag.StringVar(&cmd.name)
-	nameflag.Default("")
+	flag := cmd.Flag("name", shared.Catenate(`Specifies name for new template.`))
+	flag.StringVar(&cmd.name)
+	flag.Default("")
 
-	filesflag := cmd.Flag("files", shared.Catenate(`Directory to clone and build
+	flag = cmd.Flag("files", shared.Catenate(`Directory to clone and build
 		into the Vorteil application as the root directory of the
 		disk.`))
-	filesflag.ExistingDirVar(&cmd.files)
+	flag.ExistingDirVar(&cmd.files)
 
-	kernelflag := cmd.Flag("kernel", shared.Catenate(`Specify a version of the
+	flag = cmd.Flag("kernel", shared.Catenate(`Specify a version of the
 		Vorteil kernel to build with instead of using the default. The
 		default can be changed using the 'vcli settings kernel default'
 		command.`))
-	kernelflag.HintAction(home.ListLocalKernels)
-	kernelflag.Default(home.GlobalDefaults.Kernel)
-	kernelflag.StringVar(&cmd.kernel)
+	flag.HintAction(home.ListLocalKernels)
+	flag.Default(home.GlobalDefaults.Kernel)
+	flag.StringVar(&cmd.kernel)
 
-	debugflag := cmd.Flag("debug", shared.Catenate(`Build the Vorteil application
+	flag = cmd.Flag("debug", shared.Catenate(`Build the Vorteil application
 		using the debug version of the kernel instead of the production
 		version.`))
-	debugflag.Short('d')
-	debugflag.BoolVar(&cmd.debug)
+	flag.Short('d')
+	flag.BoolVar(&cmd.debug)
 
-	forceflag := cmd.Flag("force", shared.Catenate(`Force VCLI to overwrite existing
+	flag = cmd.Flag("force", shared.Catenate(`Force VCLI to overwrite existing
 		templates/images/files on Google Cloud Platform.`))
-	forceflag.Short('f')
-	forceflag.BoolVar(&cmd.force)
+	flag.Short('f')
+	flag.BoolVar(&cmd.force)
 
-	secureflag := cmd.Flag("secure", shared.Catenate(`(VMWARE) If present, VCLI will ignore 'insecure connection' warnings.`))
-	secureflag.Short('k')
-	secureflag.BoolVar(&cmd.secure)
+	flag = cmd.Flag("secure", shared.Catenate(`(VMWARE) If present, VCLI will ignore 'insecure connection' warnings.`))
+	flag.Short('k')
+	flag.BoolVar(&cmd.secure)
+
+	flag = cmd.Flag("config", shared.Catenate(`Override the default config
+		file associated with the app. Specifies path to desired config.`))
+	flag.Short('c')
+	flag.StringVar(&cmd.config)
 
 	cmd.Action(cmd.action)
 
@@ -171,7 +177,12 @@ func (cmd *cmdUploadTemplate) action(ctx *kingpin.ParseContext) error {
 		}
 
 		// Build from sourcefile ...
-		config := cmd.binary + ".vcfg"
+		var config string
+		if cmd.config == "" {
+			config = cmd.binary + ".vcfg"
+		} else {
+			config = cmd.config
+		}
 
 		err = cmd.validateArgs()
 		sherlock.Check(err)
@@ -755,7 +766,10 @@ func (cmd *cmdUploadTemplate) Upload(lease *object.HttpNfcLease, ofi ovfFileItem
 func (cmd *cmdUploadTemplate) validateArgs() error {
 
 	// check config file is up to date ...
-	err := shared.VCFGHealthCheck(home.Path(home.Repository), cmd.binary, false)
+	if cmd.config == "" {
+		cmd.config = cmd.binary + ".vcfg"
+	}
+	err := shared.VCFGHealthCheck(home.Path(home.Repository), cmd.config, false)
 	if err != nil {
 		return err
 	}

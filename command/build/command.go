@@ -39,6 +39,7 @@ type Command struct {
 	debug  bool
 	output string
 	icon   string
+	config string
 }
 
 // New ...
@@ -93,8 +94,7 @@ func (cmd *Command) Attach(parent command.Node) {
 		build for. The default is `+shared.VMDK+`, which outputs a .vmdk
 		file. Other options include `+shared.OVA+` (.ova file), and `+shared.GoogleImageFormat+` (Google Cloud Compatible image). You can
 		also specify `+shared.ZipArchive+` to put all of the files into
-		a zip archive useful for transporting the files and uploading to
-		a Vorteil Management System server.`))
+		a zip archive.`))
 	flag.Default(shared.VMDK)
 	flag.HintOptions(shared.VMDK, shared.ZipArchive, shared.OVA,
 		shared.GoogleImageFormat)
@@ -106,6 +106,11 @@ func (cmd *Command) Attach(parent command.Node) {
 		be a valid .png picture file.`))
 	flag.StringVar(&cmd.icon)
 	flag.Hidden()
+
+	flag = cmd.Flag("config", shared.Catenate(`Override the default config
+		file associated with the app. Specifies path to desired config.`))
+	flag.Short('c')
+	flag.StringVar(&cmd.config)
 
 	cmd.Action(cmd.action)
 
@@ -261,7 +266,11 @@ func (cmd *Command) firstTimeKernel() error {
 func (cmd *Command) validateArgs() error {
 
 	// check config file is up to date ...
-	err := shared.VCFGHealthCheck(home.Path(home.Repository), cmd.binary, false)
+	if cmd.config == "" {
+		cmd.config = cmd.binary + ".vcfg"
+	}
+
+	err := shared.VCFGHealthCheck(home.Path(home.Repository), cmd.config, false)
 	if err != nil {
 		return err
 	}
@@ -307,7 +316,12 @@ func (cmd *Command) action(ctx *kingpin.ParseContext) error {
 
 	return sherlock.Try(func() {
 
-		config := cmd.binary + ".vcfg"
+		var config string
+		if cmd.config == "" {
+			config = cmd.binary + ".vcfg"
+		} else {
+			config = cmd.config
+		}
 
 		var err error
 		var output string
@@ -336,7 +350,7 @@ func (cmd *Command) action(ctx *kingpin.ParseContext) error {
 
 			// load input from filesystem
 			if shared.IsELF(cmd.binary) {
-
+				fmt.Println(config)
 				in, err = converter.LoadLoose(cmd.binary, config, cmd.icon, cmd.files)
 				if err != nil {
 					sherlock.Check(err)
