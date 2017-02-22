@@ -66,12 +66,12 @@ type ImageHeader struct {
 	tsHost             [64]byte
 	tsServers          [4][64]byte
 	fileRedirects      [4]Redirect
-	randBytes          [8]byte
+	randBytes          [16]byte
 }
 
-func randomByteGen(n int) ([8]byte, error) {
-	var v [8]byte
-	b := make([]byte, n)
+func randomByteGen() ([16]byte, error) {
+	var v [16]byte
+	b := make([]byte, 16)
 	_, err := rand.Read(b)
 	if err != nil {
 		return v, err
@@ -185,7 +185,7 @@ func (build *builder) writeConfig() error {
 		fileRedirects:      fileRedirects,
 	}
 
-	ih.randBytes, _ = randomByteGen(8)
+	ih.randBytes, _ = randomByteGen()
 
 	convertStringToBytes(build.config.Name, ih.Name[:])
 	convertStringToBytes(build.config.Disk.FileSystem, ih.fsType[:])

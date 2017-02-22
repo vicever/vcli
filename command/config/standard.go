@@ -104,6 +104,8 @@ func (cmd *cmdStandard) action(ctx *kingpin.ParseContext) error {
 		config.Network.DNS = append(config.Network.DNS, "8.8.8.8")
 		config.Network.DNS = append(config.Network.DNS, "4.4.4.4")
 
+		config.NTP.Servers = []string{"0.pool.ntp.org", "1.pool.ntp.org", "2.pool.ntp.org", "3.pool.ntp.org"}
+
 		out, err := json.MarshalIndent(config, "", "  ")
 		sherlock.Check(err)
 
