@@ -92,12 +92,12 @@ func (cmd *Command) Attach(parent command.Node) {
 
 	flag = cmd.Flag("format", shared.Catenate(`Specify the output format to
 		build for. The default is `+shared.VMDK+`, which outputs a .vmdk
-		file. Other options include `+shared.OVA+` (.ova file), and `+shared.GoogleImageFormat+` (Google Cloud Compatible image). You can
+		file. Other options include `+shared.OVA+` (.ova file), `+shared.DynamicVHD+`, and `+shared.GoogleImageFormat+` (Google Cloud Compatible image). You can
 		also specify `+shared.ZipArchive+` to put all of the files into
 		a zip archive.`))
 	flag.Default(shared.VMDK)
 	flag.HintOptions(shared.VMDK, shared.ZipArchive, shared.OVA,
-		shared.GoogleImageFormat)
+		shared.GoogleImageFormat, shared.DynamicVHD)
 	flag.StringVar(&cmd.format)
 
 	flag = cmd.Flag("icon", shared.Catenate(`Specify a picture file to use
@@ -439,6 +439,19 @@ func (cmd *Command) action(ctx *kingpin.ParseContext) error {
 			}
 
 			output += ".tar.gz"
+
+			success = true
+
+		case shared.DynamicVHD:
+
+			if output == "" {
+				output = shared.NodeName(strings.TrimPrefix(cmd.binary, shared.RepoPrefix)) + ".vhd"
+			}
+
+			_, err = converter.ExportDynamicVHD(in, output, cmd.kernel, cmd.debug)
+			if err != nil {
+				sherlock.Check(err)
+			}
 
 			success = true
 

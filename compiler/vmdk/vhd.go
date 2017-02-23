@@ -55,22 +55,56 @@ func (build *builder) vhd() error {
 		return fmt.Errorf("vhd disk size must be a multiple of 2MB")
 	}
 
-	var cxsparse uint64                        // TODO: what is this?
+	conectix := uint64(0x636F6E6563746978)
+	cxsparse := uint64(0x6378737061727365)
 	timestamp := time.Now().Unix() - 946684800 // 2000 offset
+
+	// CHS crap
+	var cylinders, heads, sectorsPerTrack int
+	var cylinderTimesHeads int
+
+	totalSectors := build.config.Disk.DiskSize * 1024 * 2
+	if totalSectors > 65535*16*255 {
+		totalSectors = 65535 * 16 * 255
+	}
+
+	if totalSectors >= 65525*16*63 {
+		sectorsPerTrack = 255
+		heads = 16
+		cylinderTimesHeads = totalSectors / sectorsPerTrack
+	} else {
+		sectorsPerTrack = 17
+		cylinderTimesHeads = totalSectors / sectorsPerTrack
+		heads = (cylinderTimesHeads + 1023) / 1024
+		if heads < 4 {
+			heads = 4
+		}
+		if cylinderTimesHeads >= (heads*1024) || heads > 16 {
+			sectorsPerTrack = 31
+			heads = 16
+			cylinderTimesHeads = totalSectors / sectorsPerTrack
+		}
+		if cylinderTimesHeads >= heads*1024 {
+			sectorsPerTrack = 63
+			heads = 16
+			cylinderTimesHeads = totalSectors / sectorsPerTrack
+		}
+	}
+	cylinders = cylinderTimesHeads / heads
 
 	// copy of hard disk footer
 	footer := &VHDFooter{
-		Cookie:             0, // TODO: does this matter?
+		Cookie:             conectix,
 		Features:           0x00000002,
 		FileFormatVersion:  0x00010000,
 		DataOffset:         512,
 		TimeStamp:          uint32(timestamp),
-		CreatorApplication: 0, // TODO: does this matter?
-		CreatorVersion:     0, // TODO: does this matter?
-		CreatorHostOS:      0, // TODO: does this matter?
+		CreatorApplication: 0x76636C69,
+		CreatorVersion:     0x00010000, // TODO: does this matter?
+		CreatorHostOS:      0x5769326B, // TODO: does this matter?
 		OriginalSize:       uint64(build.config.Disk.DiskSize * 1024 * 1024),
 		CurrentSize:        uint64(build.config.Disk.DiskSize * 1024 * 1024),
-		DiskGeometry:       0, // TODO
+		DiskGeometry:       uint32(cylinders<<16 | heads<<8 | sectorsPerTrack),
 		DiskType:           3,
 		// TODO: UniqueID
 	}
@@ -108,11 +142,11 @@ func (build *builder) vhd() error {
 	// dynamic disk header
 	header := &VHDHeader{
 		Cookie:          cxsparse,
-		DataOffset:      0xFFFFFFFF,
+		DataOffset:      0xFFFFFFFFFFFFFFFF,
 		TableOffset:     1536,
 		HeaderVersion:   0x00010000,
 		MaxTableEntries: uint32(build.config.Disk.DiskSize / 2), // TODO: check non odd number for disk size
-		ParentTimeStamp: uint32(timestamp),
+		BlockSize:       0x200000,
 	}
 
 	buf = new(bytes.Buffer)
@@ -151,11 +185,16 @@ func (build *builder) vhd() error {
 
 	dataStart := 1024 + 512 + batSize
 
-	for i := 0; i < int(batSize/4); i++ {
-		build.disk.WriteAt([]byte{255, 255, 255, 255}, int64(int(dataStart)+int(i*4)))
-	}
+	build.disk.WriteAt(bytes.Repeat([]byte{255}, int(dataStart*4)), int64(dataStart-batSize))
 
 	// blocks
+
+	// calculate total LBAs
+	err = build.calculateLBAs()
+	if err != nil {
+		return fmt.Errorf("error analysing files: %v", err)
+	}
+	defer os.Remove(build.files.Name())
 
 	// build disk contents
 	err = build.diskContents()
@@ -246,6 +285,10 @@ func (build *builder) writeVHDBlocks(dataStart uint64) error {
 
 		}
 
+		if !unfinished {
+			copy(block[bsize-len(build.finalGrain):], build.finalGrain)
+		}
+
 		// write grain to disk
 		err = build.writeVHDBlock(dataStart, i, block)
 		if err != nil {
@@ -254,11 +297,11 @@ func (build *builder) writeVHDBlocks(dataStart uint64) error {
 
 	}
 
-	lastBlockNo := build.config.Disk.DiskSize / 2
-	err = build.writeVHDBlock(dataStart, lastBlockNo, build.finalGrain) // TODO: fix this for block instead of grain
-	if err != nil {
-		return err
-	}
+	// lastBlockNo := build.config.Disk.DiskSize / 2
+	// err = build.writeVHDBlock(dataStart, lastBlockNo, build.finalGrain) // TODO: fix this for block instead of grain
+	// if err != nil {
+	// 	return err
+	// }
 
 	return nil
 
@@ -278,11 +321,11 @@ func (build *builder) writeVHDBlock(dataStart uint64, blockNo int, block []byte)
 		return nil
 	}
 
-	// entry := build.grainCounter
-	// build.grainCounter++
+	entry := build.grainCounter
+	build.grainCounter++
 
 	// write grain to disk
-	offset := int64(dataStart + uint64(blockNo*(2*1024*1024+512)))
+	offset := int64(dataStart + uint64(entry*(2*1024*1024+512)))
 
 	_, err := build.disk.WriteAt(bytes.Repeat([]byte{255}, 512), offset)
 	if err != nil {
@@ -296,7 +339,7 @@ func (build *builder) writeVHDBlock(dataStart uint64, blockNo int, block []byte)
 
 	// add entry to grain tables
 	b := make([]byte, ref32)
-	binary.LittleEndian.PutUint32(b, uint32(offset))
+	binary.BigEndian.PutUint32(b, uint32(offset/512))
 
 	_, err = build.disk.WriteAt(b, int64(1024+512+blockNo*4))
 	if err != nil {

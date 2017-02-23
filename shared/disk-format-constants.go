@@ -23,4 +23,5 @@ const (
 	ZipArchive        = "ZIP"
 	Loose             = "LOOSE"
 	RAWSparse         = "GOOGLE"
+	DynamicVHD        = "VHD"
 )
