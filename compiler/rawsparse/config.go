@@ -15,6 +15,7 @@ package rawsparse
 
 import (
 	"bytes"
+	"crypto/rand"
 	"encoding/binary"
 	"fmt"
 )
@@ -65,6 +66,20 @@ type ImageHeader struct {
 	tsHost             [64]byte
 	tsServers          [4][64]byte
 	fileRedirects      [4]Redirect
+	randBytes          [16]byte
+}
+
+func randomByteGen() ([16]byte, error) {
+	var v [16]byte
+	b := make([]byte, 16)
+	_, err := rand.Read(b)
+	if err != nil {
+		return v, err
+	}
+	for i, z := range b {
+		v[i] = z
+	}
+	return v, nil
 }
 
 func (build *builder) writeConfig() error {
@@ -169,6 +184,8 @@ func (build *builder) writeConfig() error {
 		tsServers:          ntpServers,
 		fileRedirects:      fileRedirects,
 	}
+
+	ih.randBytes, _ = randomByteGen()
 
 	convertStringToBytes(build.config.Name, ih.Name[:])
 	convertStringToBytes(build.config.Disk.FileSystem, ih.fsType[:])

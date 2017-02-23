@@ -126,6 +126,8 @@ func (cmd *cmdNewConfig) action(ctx *kingpin.ParseContext) error {
 		f.Redirects = new(shared.RedirectConfig)
 		f.Redirects.Rules = make([]shared.Redirect, 0)
 
+		f.NTP.Servers = []string{"0.pool.ntp.org", "1.pool.ntp.org", "2.pool.ntp.org", "3.pool.ntp.org"}
+
 		err = configEditor.Edit(f, true)
 		if err != nil && err != configEditor.ErrQ {
 			sherlock.Throw(err)
